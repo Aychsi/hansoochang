@@ -238,6 +238,22 @@ content:
           price targets, identified investment opportunities, and exported comprehensive reports to Excel for further analysis. This project demonstrates 
           proficiency in financial modeling, statistical analysis, and portfolio risk management.
 
+      - layout: top-middle
+        title: NU Holdings Equity Research Report
+        link: /hansoochang/files/NU_Equity_Research_Report.pdf
+        additional_links:
+          - title: View PDF Report
+            icon: fas fa-file-pdf
+            url: /hansoochang/files/NU_Equity_Research_Report.pdf
+        description: | # this will include new lines to allow paragraphs
+          Comprehensive equity research report on Nu Holdings Ltd. (NYSE: NU), a leading digital-first neobank in Latin America. The analysis includes 
+          detailed financial analysis with 12-month price performance charts, valuation analysis using DCF, comparable company analysis, and sum-of-the-parts 
+          methodologies. The report provides a BUY rating with a $17.00 target price, representing ~11% upside potential. Key highlights include NU's 
+          rare combination of high growth (603% YoY revenue growth) with solid profitability (11% net margins), trading at a discounted P/E of 6.2x 
+          compared to both traditional banks and fintech peers. The report covers earnings momentum, technical analysis, peer comparisons, and comprehensive 
+          risk assessment including macro/FX exposure, credit risk, regulatory considerations, and competitive dynamics in the Latin American financial 
+          services market.
+
   - title: Publications # Title for the section
     layout: list # Type of content section (list/text)
     content:
