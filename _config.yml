@@ -1,6 +1,6 @@
 # Site
-repository: aychsi/hansoochang.github.io
-baseurl: /hansoochang.github.io
+repository: aychsi/hansoochang
+baseurl: /hansoochang
 favicon: images/favicon.ico
 
 # Content configuration version
