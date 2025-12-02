@@ -635,13 +635,12 @@ def generate_report():
     
     if lly_hist is not None:
         pdf.subsection_title('Price Performance Chart')
+        pdf.ln(3)
         chart_path = create_price_chart(lly_hist)
         chart_y = pdf.get_y()
         pdf.image(chart_path, x=15, y=chart_y, w=180, h=0)
         pdf.set_y(chart_y + 60)
-    
-    pdf.add_page()
-    pdf.section_title('FINANCIAL ANALYSIS (continued)')
+        pdf.ln(5)
     
     pdf.subsection_title('Historical Financial Metrics (TTM)')
     pdf.ln(5)
