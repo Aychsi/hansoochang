@@ -870,6 +870,7 @@ def generate_report():
     pdf.body_text('- GLP-1 revenue exceeds expectations: 30%+ CAGR through 2027')
     pdf.body_text('- Operating margins expand to 42%+ by 2026 (stronger leverage from normalized 38% base)')
     pdf.body_text('- Positive CVOT data expands addressable market significantly')
+    pdf.body_text('- Oral GLP-1 (orforglipron) launch accelerates market penetration, addressing adherence challenges')
     pdf.body_text('- Manufacturing capacity expansion ahead of schedule')
     pdf.body_text('- Multiple maintains at 52x (current market premium) as exceptional growth sustainability proven')
     
