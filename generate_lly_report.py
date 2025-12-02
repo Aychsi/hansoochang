@@ -494,7 +494,8 @@ def generate_report():
         "GLP-1 franchise (Mounjaro/Zepbound) drives majority of growth, with contributions from Verzenio, Taltz, and other "
         "products. Assumptions reflect: (1) Strong U.S. market share gains and penetration, (2) Accelerated international "
         "expansion, (3) Manufacturing capacity expansion supporting volume growth, (4) Pricing power maintained in near-term "
-        "due to supply constraints and superior efficacy data."
+        "due to supply constraints and superior efficacy data, (5) Potential contribution from oral GLP-1 (orforglipron) "
+        "launch in 2026-2027, addressing adherence challenges and expanding addressable market."
     )
     pdf.footnote("Sources: Company 10-K filings, company guidance ($58-61B for 2025), consensus estimates, IQVIA prescription data")
     
@@ -606,6 +607,27 @@ def generate_report():
         "cardiovascular risk reduction, significantly increasing TAM."
     )
     pdf.footnote("Sources: SELECT trial (NEJM 2023), SURMOUNT-MMO (NCT05556512)")
+    pdf.ln(3)
+    pdf.body_text(
+        "Oral GLP-1 formulations represent a critical growth driver addressing patient adherence challenges. While "
+        "injectable GLP-1s dominate the current market, real-world adherence to injectable formulations has been "
+        "suboptimal, with a high proportion of patients discontinuing within the first year. This non-adherence "
+        "problem limits drug effectiveness and market size. Oral semaglutide (Rybelsus) is already FDA-approved for "
+        "Type 2 diabetes, and real-world studies of commercially insured adults showed that the oral formulation had "
+        "the highest adherence rate (65.1%) compared to injectable GLP-1s over 12 months, suggesting better convenience "
+        "and compliance."
+    )
+    pdf.footnote("Sources: Real-world adherence studies, FDA approvals, commercial insurance claims data")
+    pdf.ln(3)
+    pdf.body_text(
+        "Eli Lilly is developing orforglipron, an oral GLP-1/GIP receptor agonist currently in Phase 3 trials. "
+        "Phase 2 data published in the New England Journal of Medicine demonstrated significant weight loss and "
+        "glucose-lowering efficacy for orforglipron, with a favorable safety profile. The transition to oral "
+        "formulations is crucial for compliance and convenience, and represents a significant expansion opportunity "
+        "for the GLP-1 market. Other companies are also advancing oral GLP-1 candidates in Phase 2/3 development, "
+        "indicating industry-wide recognition of this growth vector."
+    )
+    pdf.footnote("Sources: Orforglipron Phase 2 trial (NEJM 2024, DOI: 10.1056/NEJMoa2511774), company pipeline disclosures, clinical trial registries")
     
     # Financial Analysis
     pdf.add_page()
