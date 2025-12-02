@@ -639,22 +639,25 @@ def generate_report():
         pdf.ln(2)
         chart_path = create_price_chart(lly_hist)
         chart_y = pdf.get_y()
-        # Chart height is approximately 50-55 units, add buffer
-        chart_height = 65
+        # Chart is 4.5 inches tall, at 180mm width, proportional height is ~95mm
+        # But to be safe, we'll use a larger buffer
+        chart_height_estimate = 100  # Conservative estimate in mm
         # Check if we have enough space for the chart
-        if chart_y + chart_height > 280:  # If chart would go past page, start new page
+        if chart_y + chart_height_estimate > 280:  # If chart would go past page, start new page
             pdf.add_page()
             chart_y = pdf.get_y()
         pdf.image(chart_path, x=15, y=chart_y, w=180, h=0)
-        # Set Y position after chart with proper spacing
-        pdf.set_y(chart_y + chart_height)
+        # Get actual Y position after image is placed
+        # The image with h=0 will scale proportionally: 180mm width, chart is 8.5x4.5 inches
+        # So height = 180 * (4.5/8.5) = ~95mm
+        actual_chart_height = 180 * (4.5 / 8.5)  # ~95mm
+        pdf.set_y(chart_y + actual_chart_height + 10)  # Add 10mm buffer after chart
         pdf.ln(5)  # Extra spacing after chart
     
-    # Check if we have enough space for the metrics table before placing it
-    current_y = pdf.get_y()
-    # Table needs: subsection title (10) + spacing (3) + header (8) + 6 rows (42) + spacing = ~70 units
-    if current_y + 70 > 280:
+    # Always put metrics table on a new page if chart was added to avoid any overlap
+    if lly_hist is not None:
         pdf.add_page()
+        pdf.ln(2)
     
     pdf.subsection_title('Historical Financial Metrics (TTM)')
     pdf.ln(3)
