@@ -764,15 +764,23 @@ def generate_report():
             blend_components.append("analyst consensus")
         blend_text = " and ".join(blend_components)
         pdf.body_text(
-            f"After blending the P/E-derived target (${target_price_base_pe:.2f}) with {blend_text}, the final base case target "
+            f"After blending the P/E-derived target (${target_price_base_pe:.2f}) with {blend_text}, the base case target "
             f"price is ${target_price_base:.2f}. This blended approach accounts for cash flow-based valuation and market "
-            f"consensus, providing a more balanced assessment than P/E multiple alone. The blended target is "
+            f"consensus, providing a more balanced assessment than P/E multiple alone. The blended base case target is "
             f"${target_price_base_pe - target_price_base:.2f} lower than the P/E-only target, reflecting the more conservative "
             f"valuation from DCF methodology and market consensus."
         )
+        pdf.ln(2)
+        pdf.body_text(
+            f"Note: The base case target (${target_price_base:.2f}) is then incorporated into a probability-weighted framework "
+            f"with bull and bear scenarios. The final target price shown on the cover page (${target_price:.2f}) reflects "
+            f"additional weighting toward the bull case, reflecting our conviction that consensus underestimates GLP-1 durability."
+        )
     else:
         pdf.body_text(
-            f"The base case target price of ${target_price_base:.2f} is derived directly from the P/E multiple method."
+            f"The base case target price of ${target_price_base:.2f} is derived directly from the P/E multiple method. "
+            f"This is then incorporated into a probability-weighted framework to arrive at the final target price "
+            f"(${target_price:.2f}) shown on the cover page."
         )
     pdf.footnote(f"Sources: Consensus forward EPS from yfinance ({forward_eps:.2f}), company financials for revenue base")
     
