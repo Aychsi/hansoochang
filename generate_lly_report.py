@@ -218,11 +218,6 @@ def generate_report():
         
         ttm_eps = lly_info.get('trailingEps', 20.45)
         forward_eps = lly_info.get('forwardEps', 22.66)  # Consensus estimate
-        
-        # Get real operating margin
-        op_margin_2024 = lly_info.get('operatingMargins', 0.21)
-        if op_margin_2024 > 0.5:  # Sanity check - 48% seems too high, might be wrong
-            op_margin_2024 = 0.21  # Use more reasonable estimate
     
     # Financial Model - Using Real Data and Company Guidance
     # Company guidance: 2024 ~$45B, 2025 $58-61B (midpoint $59.5B)
@@ -770,9 +765,10 @@ def generate_report():
         f"consensus underestimates the durability and magnitude of GLP-1 cash flows."
     )
     pdf.ln(2)
+    dcf_text = f"${dcf_price:.2f}" if dcf_price else "below current price"
     pdf.body_text(
         "Explicit Trade-Off: We are paying up for a category-defining GLP-1 franchise and pipeline. On conservative DCF "
-        f"(${dcf_price:.2f} if calculated) and base-case multiples (45x on 2026E EPS = ${target_price_base:.2f}), the stock "
+        f"({dcf_text}) and base-case multiples (45x on 2026E EPS = ${target_price_base:.2f}), the stock "
         f"is near fair value at current price (~${current_price:.2f}). Our BUY rating is driven by the view that consensus "
         "underestimates the durability and magnitude of GLP-1 cash flows, so the bull case has a higher effective probability "
         "than the simple 25% we show in base scenarios. This is a high-conviction, high-valuation call on GLP-1 market "
@@ -831,8 +827,9 @@ def generate_report():
                   f"(~$1,045-1,050 implies 45-50x on 2026E EPS). Justified by: (1) GLP-1 market leadership, "
                   f"(2) Superior growth trajectory (28% revenue CAGR), (3) PEG ratio of ~1.6x (45x / 28% growth), "
                   f"(4) Modest de-rating from current ~52x trailing as growth normalizes.")
+    dcf_target_text = f"${dcf_price:.2f} (blended 50/50 with P/E method)" if dcf_price else "below current price (reflecting valuation gravity)"
     pdf.body_text(f"5. DCF Valuation: 5-year free cash flow projections discounted at WACC of {wacc*100:.1f}%, with terminal "
-                  f"growth of 3.5%, resulting in DCF-derived price target of ${dcf_price:.2f} (blended 50/50 with P/E method).")
+                  f"growth of 3.5%, resulting in DCF-derived price target of {dcf_target_text}.")
     pdf.body_text(f"6. Scenario Weighting: Base probabilities: Bull case (35% probability, ${target_price_bull:.2f}), "
                   f"Base case (45% probability, ${target_price_base:.2f}), Bear case (20% probability, ${target_price_bear:.2f}). "
                   f"Final target applies additional 40% weighting to bull case, reflecting conviction that consensus underestimates "
