@@ -748,13 +748,32 @@ def generate_report():
     pdf.ln(3)
     pdf.subsection_title('1. Forward P/E Multiple Method')
     pdf.body_text(
-        f"Base case applies 45x multiple to 2026E EPS of ${eps_2026:.2f} (derived from revenue model and margin "
-        f"assumptions), resulting in ${target_price_base:.2f}. We use consensus forward EPS of ${forward_eps:.2f} for "
+        f"Base case P/E valuation: Applying 45x multiple to 2026E EPS of ${eps_2026:.2f} (derived from revenue model and margin "
+        f"assumptions) yields a P/E-derived target of ${target_price_base_pe:.2f}. We use consensus forward EPS of ${forward_eps:.2f} for "
         f"2024E. The 45x multiple reflects: (1) Alignment with current market pricing (~$1,045-1,050 implies 45-50x on 2026E EPS), "
         f"(2) Modest de-rating from current ~52x trailing P/E as growth normalizes, (3) GLP-1 market leadership justifies "
         f"premium multiple, (4) PEG ratio of ~1.6x (45x P/E / 28% growth) reasonable for high-growth pharma, "
         f"(5) Current market already pricing in base-case multiple, so upside comes from bull scenario execution."
     )
+    pdf.ln(2)
+    if dcf_price or analyst_targets:
+        blend_components = []
+        if dcf_price:
+            blend_components.append("DCF valuation")
+        if analyst_targets:
+            blend_components.append("analyst consensus")
+        blend_text = " and ".join(blend_components)
+        pdf.body_text(
+            f"After blending the P/E-derived target (${target_price_base_pe:.2f}) with {blend_text}, the final base case target "
+            f"price is ${target_price_base:.2f}. This blended approach accounts for cash flow-based valuation and market "
+            f"consensus, providing a more balanced assessment than P/E multiple alone. The blended target is "
+            f"${target_price_base_pe - target_price_base:.2f} lower than the P/E-only target, reflecting the more conservative "
+            f"valuation from DCF methodology and market consensus."
+        )
+    else:
+        pdf.body_text(
+            f"The base case target price of ${target_price_base:.2f} is derived directly from the P/E multiple method."
+        )
     pdf.footnote(f"Sources: Consensus forward EPS from yfinance ({forward_eps:.2f}), company financials for revenue base")
     
     pdf.ln(3)
