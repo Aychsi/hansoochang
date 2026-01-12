@@ -1,8 +1,8 @@
-# Financial Crimes Compliance: Surveillance and Market Manipulation Detection System
+# Merck & McKinsey Financial Risk Modeling: Portfolio Segmentation & Market Analysis
 
-**Project:** Surveillance and Market Manipulation Detection for Fidelity  
-**Role:** Lead Data Scientist in Financial Crimes Compliance  
-**Framework:** Adapted from Merck & Co. / McKinsey Financial Risk Modeling Methodology
+**Project:** Pharmaceutical Sales Risk Analysis & Portfolio Optimization  
+**Role:** Data and Business Analytics Intern at Merck & Co., Inc.  
+**Collaboration:** Partnered with McKinsey Finance Teams for New Drug Launch Financial Risk Models
 
 ## Executive Summary
 
