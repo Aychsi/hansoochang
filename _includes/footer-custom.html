@@ -1,8 +1,10 @@
+<!-- Custom footer includes -->
 <script>
-// Tab functionality for CV sections - Inline to ensure it loads on GitHub Pages
+// Tab functionality for CV sections - Top Navigation Style
 (function() {
   'use strict';
 
+  // Map of section IDs to tab labels
   const sectionTabs = {
     'education': 'Education',
     'work-experience': 'Experience',
@@ -16,15 +18,48 @@
   };
 
   function initTabs() {
+    // Find all sections that should be in tabs
     const sections = {};
     const tabLabels = new Set();
     
+    // Collect all sections by finding h2 or section headers with matching text
+    const allHeadings = document.querySelectorAll('h2, h3, [class*="section"]');
+    const sectionMap = {
+      'Education': 'education',
+      'Work Experience': 'work-experience',
+      'Selected Projects and Research': 'selected-projects-and-research',
+      'Personal Projects': 'personal-projects',
+      'Finance Projects': 'finance-projects',
+      'Publications': 'publications',
+      'Presentations': 'presentations',
+      'Sample Research Poster': 'sample-research-poster',
+      'Sample Industry Poster': 'sample-industry-poster'
+    };
+    
+    // First try finding by ID
     Object.keys(sectionTabs).forEach(sectionId => {
-      const section = document.getElementById(sectionId);
+      let section = document.getElementById(sectionId);
+      if (!section) {
+        // Try finding by data attribute or class
+        section = document.querySelector(`[data-section="${sectionId}"], .${sectionId}`);
+      }
+      if (!section) {
+        // Try finding by heading text
+        const label = sectionTabs[sectionId];
+        const heading = Array.from(document.querySelectorAll('h2, h3')).find(h => 
+          h.textContent.trim() === label || h.textContent.trim().includes(label)
+        );
+        if (heading) {
+          section = heading.closest('.container') || heading.closest('section') || heading.parentElement;
+        }
+      }
+      
       if (section) {
         const tabLabel = sectionTabs[sectionId];
         tabLabels.add(tabLabel);
-        const container = section.closest('.container');
+        
+        // Find the container (parent .container div)
+        const container = section.closest('.container') || section;
         if (container) {
           if (!sections[tabLabel]) {
             sections[tabLabel] = [];
@@ -35,24 +70,34 @@
     });
 
     if (Object.keys(sections).length === 0) {
-      return;
+      return; // No sections found
     }
 
+    // Group poster sections together
     if (sections['Posters'] && sections['Posters'].length > 1) {
       const postersContainers = sections['Posters'];
       const firstPoster = postersContainers[0];
       const parentContainer = firstPoster.parentElement;
+      
+      // Create wrapper for posters
       const postersWrapper = document.createElement('div');
       postersWrapper.className = 'container section-in-tabs';
       postersWrapper.setAttribute('data-tab-section', 'Posters');
       postersWrapper.style.display = 'none';
+      
+      // Insert wrapper before first poster
       parentContainer.insertBefore(postersWrapper, firstPoster);
+      
+      // Move all poster containers into wrapper
       postersContainers.forEach(container => {
         postersWrapper.appendChild(container);
       });
+      
+      // Update sections object
       sections['Posters'] = [postersWrapper];
     }
 
+    // Mark all sections as tab sections
     Object.keys(sections).forEach(tabLabel => {
       sections[tabLabel].forEach(container => {
         container.classList.add('section-in-tabs');
@@ -61,17 +106,22 @@
       });
     });
 
+    // Find where to insert the navigation (after About Me section)
     const aboutMe = document.getElementById('about-me');
     const mainContent = aboutMe ? aboutMe.closest('main') : document.querySelector('main');
+    
     if (!mainContent) {
       return;
     }
 
+    // Create navigation bar
     const navContainer = document.createElement('div');
     navContainer.className = 'main-nav-tabs';
+    
     const navList = document.createElement('div');
     navList.className = 'tabs-nav';
     
+    // Create tab buttons
     const tabLabelsArray = Array.from(tabLabels).sort();
     tabLabelsArray.forEach((tabLabel, index) => {
       const button = document.createElement('button');
@@ -85,6 +135,7 @@
     
     navContainer.appendChild(navList);
     
+    // Insert navigation after About Me section
     const aboutMeContainer = aboutMe ? aboutMe.closest('.container') : null;
     if (aboutMeContainer && aboutMeContainer.nextSibling) {
       aboutMeContainer.parentElement.insertBefore(navContainer, aboutMeContainer.nextSibling);
@@ -94,12 +145,14 @@
       mainContent.appendChild(navContainer);
     }
 
+    // Show first tab by default
     if (tabLabelsArray.length > 0) {
       switchTab(tabLabelsArray[0], false);
     }
   }
 
   function switchTab(tabLabel, animate = true) {
+    // Update button states
     document.querySelectorAll('.tab-button').forEach(btn => {
       btn.classList.remove('active');
       if (btn.getAttribute('data-tab') === tabLabel) {
@@ -107,17 +160,20 @@
       }
     });
 
+    // Hide all sections
     document.querySelectorAll('.section-in-tabs').forEach(section => {
       section.classList.remove('active');
       section.style.display = 'none';
     });
     
+    // Show the active section
     const activeSections = document.querySelectorAll(`.section-in-tabs[data-tab-section="${tabLabel}"]`);
     activeSections.forEach(section => {
       section.classList.add('active');
       section.style.display = 'block';
     });
     
+    // Scroll to top of navigation
     if (animate) {
       const navContainer = document.querySelector('.main-nav-tabs');
       if (navContainer) {
@@ -126,10 +182,12 @@
     }
   }
 
+  // Initialize when DOM is ready - try multiple times to ensure it runs
   function tryInit() {
     if (document.getElementById('about-me') && document.querySelector('main')) {
       initTabs();
     } else {
+      // Retry after a short delay
       setTimeout(tryInit, 100);
     }
   }
@@ -137,6 +195,7 @@
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', tryInit);
   } else {
+    // DOM already loaded, try immediately
     tryInit();
   }
 })();
