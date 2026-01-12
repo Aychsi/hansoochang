@@ -28,7 +28,7 @@ Jekyll::Hooks.register :site, :post_render do |site|
     
     # Inject script before closing body tag
     baseurl = site.config['baseurl'] || ''
-    script_path = "#{baseurl}/assets/tabs.js"
+    script_path = baseurl.empty? ? '/assets/tabs.js' : "#{baseurl}/assets/tabs.js"
     page.output = page.output.gsub(
       /<\/body>/i,
       "<script src=\"#{script_path}\" defer></script></body>"
