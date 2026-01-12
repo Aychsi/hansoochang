@@ -26,12 +26,14 @@ Jekyll::Hooks.register :site, :post_render do |site|
     next unless page.output
     next unless page.url == '/' || page.url == '/index.html'
     
-    # Inject script before closing body tag
-    baseurl = site.config['baseurl'] || ''
-    script_path = baseurl.empty? ? '/assets/tabs.js' : "#{baseurl}/assets/tabs.js"
-    page.output = page.output.gsub(
-      /<\/body>/i,
-      "<script src=\"#{script_path}\" defer></script></body>"
-    )
+    # Read the tabs.js file and inject inline
+    tabs_js_path = File.join(site.source, 'assets', 'tabs.js')
+    if File.exist?(tabs_js_path)
+      tabs_script = File.read(tabs_js_path)
+      page.output = page.output.gsub(
+        /<\/body>/i,
+        "<script>#{tabs_script}</script></body>"
+      )
+    end
   end
 end
