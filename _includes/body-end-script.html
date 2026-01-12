@@ -8,7 +8,7 @@
   
   function loadTabsScript() {
     var script = document.createElement('script');
-    script.src = '{{ "/assets/tabs.js" | relative_url }}';
+    script.src = '{{ "/assets/tabs.js" | absolute_url }}';
     script.defer = true;
     script.setAttribute('data-tabs-loaded', 'true');
     
