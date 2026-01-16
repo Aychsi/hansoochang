@@ -1,112 +1,170 @@
 <script>
-// Simple navigation tabs - inspired by wengong-jin.github.io
+// Tab navigation system - hide/show sections
 (function() {
   'use strict';
-  if (window.__navInit) return;
-  window.__navInit = true;
+  if (window.__tabsInit) return;
+  window.__tabsInit = true;
 
-  // Section IDs and labels
-  var sections = [
-    {id: 'about-me', label: 'About'},
-    {id: 'education', label: 'Education'},
-    {id: 'work-experience', label: 'Experience'},
-    {id: 'selected-projects-and-research', label: 'Research'},
-    {id: 'personal-projects', label: 'Projects'},
-    {id: 'finance-projects', label: 'Finance'},
-    {id: 'publications', label: 'Publications'},
-    {id: 'presentations', label: 'Presentations'}
-  ];
+  // Map section IDs to tab labels
+  var sectionMap = {
+    'education': 'Education',
+    'work-experience': 'Experience',
+    'selected-projects-and-research': 'Research',
+    'personal-projects': 'Projects',
+    'finance-projects': 'Finance',
+    'publications': 'Publications',
+    'presentations': 'Presentations',
+    'sample-research-poster': 'Posters',
+    'sample-industry-poster': 'Posters'
+  };
 
-  function initNav() {
-    var header = document.querySelector('.header-container');
-    if (!header) return;
+  function initTabs() {
+    var sections = {};
+    var labels = [];
+    
+    // Find all sections
+    for (var id in sectionMap) {
+      var heading = document.getElementById(id);
+      if (heading) {
+        var label = sectionMap[id];
+        var container = heading.closest('.container');
+        if (container) {
+          if (!sections[label]) {
+            sections[label] = [];
+            if (labels.indexOf(label) === -1) {
+              labels.push(label);
+            }
+          }
+          sections[label].push(container);
+        }
+      }
+    }
+
+    if (labels.length === 0) {
+      console.log('No sections found');
+      return;
+    }
+
+    // Handle poster sections - combine them
+    if (sections['Posters'] && sections['Posters'].length > 1) {
+      var posters = sections['Posters'];
+      var firstPoster = posters[0];
+      var parent = firstPoster.parentElement;
+      
+      var wrapper = document.createElement('div');
+      wrapper.className = 'container list-container cv-tab-section';
+      wrapper.setAttribute('data-tab', 'Posters');
+      wrapper.style.display = 'none';
+      
+      parent.insertBefore(wrapper, firstPoster);
+      posters.forEach(function(poster) {
+        wrapper.appendChild(poster);
+      });
+      
+      sections['Posters'] = [wrapper];
+    }
+
+    // Mark and hide all sections
+    for (var label in sections) {
+      sections[label].forEach(function(container) {
+        container.classList.add('cv-tab-section');
+        container.setAttribute('data-tab', label);
+        container.style.display = 'none';
+      });
+    }
+
+    // Find where to insert navigation
+    var aboutMe = document.getElementById('about-me');
+    var main = document.querySelector('main');
+    if (!main) return;
 
     // Create navigation bar
     var nav = document.createElement('nav');
-    nav.className = 'main-nav';
-    nav.style.cssText = 'background: #fff; border-bottom: 1px solid #e0e0e0; padding: 1rem 0; position: sticky; top: 0; z-index: 1000;';
+    nav.className = 'cv-tabs-nav';
     
     var navList = document.createElement('ul');
-    navList.style.cssText = 'list-style: none; margin: 0; padding: 0; display: flex; justify-content: center; flex-wrap: wrap; gap: 2rem;';
+    navList.className = 'cv-tabs-list';
     
-    sections.forEach(function(section) {
+    // Create tab buttons - keep Education first
+    var orderedLabels = ['Education', 'Experience', 'Research', 'Projects', 'Finance', 'Publications', 'Presentations', 'Posters'];
+    var finalLabels = orderedLabels.filter(function(l) { return labels.indexOf(l) !== -1; });
+    
+    finalLabels.forEach(function(label, i) {
       var item = document.createElement('li');
-      var link = document.createElement('a');
-      link.href = '#' + section.id;
-      link.textContent = section.label;
-      link.style.cssText = 'text-decoration: none; color: #666; font-weight: 500; padding: 0.5rem 1rem; transition: color 0.3s;';
-      link.addEventListener('mouseenter', function() {
-        this.style.color = '#2c3e50';
-      });
-      link.addEventListener('mouseleave', function() {
-        if (!this.classList.contains('active')) {
-          this.style.color = '#666';
-        }
-      });
-      link.addEventListener('click', function(e) {
-        e.preventDefault();
-        var target = document.getElementById(section.id);
-        if (target) {
-          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          // Update active state
-          document.querySelectorAll('.main-nav a').forEach(function(a) {
-            a.classList.remove('active');
-            a.style.color = '#666';
-          });
-          this.classList.add('active');
-          this.style.color = '#2c3e50';
-        }
-      });
-      item.appendChild(link);
+      var btn = document.createElement('button');
+      btn.className = 'cv-tab-btn' + (i === 0 ? ' active' : '');
+      btn.textContent = label;
+      btn.setAttribute('data-tab', label);
+      btn.type = 'button';
+      btn.onclick = function() {
+        switchTab(label);
+      };
+      item.appendChild(btn);
       navList.appendChild(item);
     });
     
     nav.appendChild(navList);
     
-    // Insert after header
-    header.parentElement.insertBefore(nav, header.nextSibling);
-    
-    // Set first link as active
-    var firstLink = navList.querySelector('a');
-    if (firstLink) {
-      firstLink.classList.add('active');
-      firstLink.style.color = '#2c3e50';
+    // Insert navigation after About Me
+    var aboutContainer = aboutMe ? aboutMe.closest('.container') : null;
+    if (aboutContainer && aboutContainer.nextSibling) {
+      aboutContainer.parentElement.insertBefore(nav, aboutContainer.nextSibling);
+    } else if (main.firstChild) {
+      main.insertBefore(nav, main.firstChild);
+    } else {
+      main.appendChild(nav);
+    }
+
+    // Show first tab (Education)
+    if (finalLabels.length > 0) {
+      switchTab(finalLabels[0], false);
     }
   }
 
-  // Dark mode support
-  function updateNavColors() {
-    var isDark = document.body.classList.contains('dark');
-    var nav = document.querySelector('.main-nav');
-    if (nav) {
-      if (isDark) {
-        nav.style.background = '#1a1a1a';
-        nav.style.borderBottomColor = '#444';
-        nav.querySelectorAll('a').forEach(function(a) {
-          if (!a.classList.contains('active')) {
-            a.style.color = '#aaa';
-          }
-        });
+  function switchTab(label, scroll) {
+    scroll = scroll !== false;
+    
+    // Update buttons
+    document.querySelectorAll('.cv-tab-btn').forEach(function(btn) {
+      if (btn.getAttribute('data-tab') === label) {
+        btn.classList.add('active');
       } else {
-        nav.style.background = '#fff';
-        nav.style.borderBottomColor = '#e0e0e0';
-        nav.querySelectorAll('a').forEach(function(a) {
-          if (!a.classList.contains('active')) {
-            a.style.color = '#666';
-          }
-        });
+        btn.classList.remove('active');
+      }
+    });
+
+    // Hide all sections
+    document.querySelectorAll('.cv-tab-section').forEach(function(section) {
+      section.style.display = 'none';
+    });
+    
+    // Show selected sections
+    document.querySelectorAll('.cv-tab-section[data-tab="' + label + '"]').forEach(function(section) {
+      section.style.display = 'block';
+    });
+    
+    if (scroll) {
+      var nav = document.querySelector('.cv-tabs-nav');
+      if (nav) {
+        nav.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     }
   }
 
   // Initialize
   function tryInit() {
-    var header = document.querySelector('.header-container');
-    if (header) {
-      setTimeout(initNav, 100);
-      setTimeout(updateNavColors, 150);
+    var main = document.querySelector('main');
+    var edu = document.getElementById('education');
+    if (main && edu) {
+      setTimeout(initTabs, 200);
     } else {
-      setTimeout(tryInit, 100);
+      if (typeof tryInit.retries === 'undefined') {
+        tryInit.retries = 0;
+      }
+      tryInit.retries++;
+      if (tryInit.retries < 50) {
+        setTimeout(tryInit, 100);
+      }
     }
   }
   
