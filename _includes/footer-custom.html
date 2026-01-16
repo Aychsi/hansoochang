@@ -1,13 +1,11 @@
 <script>
-// Simple tabs implementation - runs immediately
+// Tabs implementation - fixed version (backup in footer)
 (function() {
   'use strict';
-  
-  // Prevent double execution
-  if (window.__tabsDone) return;
-  window.__tabsDone = true;
+  if (window.__tabsInit) return;
+  window.__tabsInit = true;
 
-  var sectionIds = {
+  var map = {
     'education': 'Education',
     'work-experience': 'Experience',
     'selected-projects-and-research': 'Research',
@@ -19,20 +17,23 @@
     'sample-industry-poster': 'Posters'
   };
 
-  function makeTabs() {
+  function init() {
     var sections = {};
     var labels = [];
     
-    // Find all sections
-    for (var id in sectionIds) {
-      var el = document.getElementById(id);
-      if (el) {
-        var label = sectionIds[id];
-        var container = el.closest('.container');
+    // Find all sections by their h3 IDs
+    for (var id in map) {
+      var heading = document.getElementById(id);
+      if (heading) {
+        var label = map[id];
+        // Find the parent container using closest (more reliable)
+        var container = heading.closest('.container');
         if (container) {
           if (!sections[label]) {
             sections[label] = [];
-            labels.push(label);
+            if (labels.indexOf(label) === -1) {
+              labels.push(label);
+            }
           }
           sections[label].push(container);
         }
@@ -40,25 +41,34 @@
     }
 
     if (labels.length === 0) {
-      console.log('No sections found');
+      console.log('No sections found for tabs');
       return;
     }
 
-    // Handle posters
+    // Handle poster sections - combine them into one
     if (sections['Posters'] && sections['Posters'].length > 1) {
       var posters = sections['Posters'];
-      var first = posters[0];
-      var parent = first.parentElement;
+      var firstPoster = posters[0];
+      var parent = firstPoster.parentElement;
+      
+      // Create wrapper
       var wrapper = document.createElement('div');
-      wrapper.className = 'container section-in-tabs';
+      wrapper.className = 'container list-container section-in-tabs';
       wrapper.setAttribute('data-tab', 'Posters');
       wrapper.style.display = 'none';
-      parent.insertBefore(wrapper, first);
-      posters.forEach(function(p) { wrapper.appendChild(p); });
+      
+      // Insert wrapper before first poster
+      parent.insertBefore(wrapper, firstPoster);
+      
+      // Move all poster containers into wrapper
+      posters.forEach(function(poster) {
+        wrapper.appendChild(poster);
+      });
+      
       sections['Posters'] = [wrapper];
     }
 
-    // Hide all sections
+    // Hide all sections and mark them
     for (var label in sections) {
       sections[label].forEach(function(container) {
         container.classList.add('section-in-tabs');
@@ -67,17 +77,18 @@
       });
     }
 
-    // Find where to add nav
+    // Find where to insert navigation
     var aboutMe = document.getElementById('about-me');
     var main = document.querySelector('main');
     if (!main) return;
 
-    // Create nav
+    // Create navigation bar
     var nav = document.createElement('div');
     nav.className = 'main-nav-tabs';
     var navList = document.createElement('div');
     navList.className = 'tabs-nav';
     
+    // Sort labels and create buttons
     labels.sort();
     labels.forEach(function(label, i) {
       var btn = document.createElement('button');
@@ -85,13 +96,15 @@
       btn.textContent = label;
       btn.setAttribute('data-tab', label);
       btn.type = 'button';
-      btn.onclick = function() { showTab(label); };
+      btn.onclick = function() { 
+        showTab(label); 
+      };
       navList.appendChild(btn);
     });
     
     nav.appendChild(navList);
     
-    // Insert nav
+    // Insert navigation after About Me section
     var aboutContainer = aboutMe ? aboutMe.closest('.container') : null;
     if (aboutContainer && aboutContainer.nextSibling) {
       aboutContainer.parentElement.insertBefore(nav, aboutContainer.nextSibling);
@@ -101,16 +114,16 @@
       main.appendChild(nav);
     }
 
-    // Show first tab
+    // Show first tab by default
     if (labels.length > 0) {
       showTab(labels[0], false);
     }
   }
 
   function showTab(label, scroll) {
-    scroll = scroll !== false;
+    if (scroll === undefined) scroll = true;
     
-    // Update buttons
+    // Update button states
     document.querySelectorAll('.tab-button').forEach(function(btn) {
       btn.classList.remove('active');
       if (btn.getAttribute('data-tab') === label) {
@@ -118,35 +131,48 @@
       }
     });
 
-    // Show/hide sections
+    // Hide all sections
     document.querySelectorAll('.section-in-tabs').forEach(function(section) {
-      if (section.getAttribute('data-tab') === label) {
-        section.style.display = 'block';
-        section.classList.add('active');
-      } else {
-        section.style.display = 'none';
-        section.classList.remove('active');
-      }
+      section.style.display = 'none';
+      section.classList.remove('active');
     });
     
+    // Show the selected tab's sections
+    document.querySelectorAll('.section-in-tabs[data-tab="' + label + '"]').forEach(function(section) {
+      section.style.display = 'block';
+      section.classList.add('active');
+    });
+    
+    // Scroll to navigation if needed
     if (scroll) {
       var nav = document.querySelector('.main-nav-tabs');
-      if (nav) nav.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      if (nav) {
+        nav.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
     }
   }
 
-  // Try to run
+  // Initialize when DOM is ready
   function tryRun() {
     var main = document.querySelector('main');
     var edu = document.getElementById('education');
     if (main && edu) {
-      setTimeout(makeTabs, 50);
+      // Wait a bit for everything to render
+      setTimeout(init, 100);
     } else {
-      setTimeout(tryRun, 100);
+      if (typeof tryRun.retries === 'undefined') {
+        tryRun.retries = 0;
+      }
+      tryRun.retries++;
+      if (tryRun.retries < 50) {
+        setTimeout(tryRun, 100);
+      } else {
+        console.log('Tabs: Could not find required elements');
+      }
     }
   }
 
-  // Start
+  // Start initialization
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', tryRun);
   } else {
