@@ -7,9 +7,8 @@
   
   function loadTabsScript() {
     var script = document.createElement('script');
-    // Get baseurl from Jekyll site config (rendered by Liquid)
-    var baseurl = '{{ site.baseurl }}' || '';
-    script.src = baseurl + '/assets/tabs.js';
+    // Use Jekyll's relative_url filter to get correct path with baseurl
+    script.src = '{{ "/assets/tabs.js" | relative_url }}';
     script.defer = true;
     script.setAttribute('data-tabs-loaded', 'true');
     (document.head || document.body).appendChild(script);
