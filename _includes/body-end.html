@@ -26,10 +26,9 @@
       var heading = document.getElementById(id);
       if (heading) {
         var label = map[id];
-        // Find the parent container (the div.container.list-container that contains this h3)
-        var container = heading.parentElement;
-        // Make sure it's a container
-        if (container && container.classList.contains('container')) {
+        // Find the parent container using closest (more reliable)
+        var container = heading.closest('.container');
+        if (container) {
           if (!sections[label]) {
             sections[label] = [];
             if (labels.indexOf(label) === -1) {
