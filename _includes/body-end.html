@@ -7,7 +7,8 @@
   
   function loadTabsScript() {
     var script = document.createElement('script');
-    script.src = '/assets/tabs.js';
+    // Use Jekyll's relative_url filter to get correct path with baseurl
+    script.src = '{{ "/assets/tabs.js" | relative_url }}';
     script.defer = true;
     script.setAttribute('data-tabs-loaded', 'true');
     (document.head || document.body).appendChild(script);
