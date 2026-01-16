@@ -366,4 +366,3 @@ sass:
 
 plugins:
  - jekyll-seo-tag
- - tabs_generator
