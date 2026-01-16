@@ -1,182 +1,156 @@
 <script>
+// Simple tabs implementation - runs immediately
 (function() {
   'use strict';
   
-  // Map section titles to tab labels
-  const sectionMap = {
-    'Education': 'Education',
-    'Work Experience': 'Experience', 
-    'Selected Projects and Research': 'Research',
-    'Personal Projects': 'Projects',
-    'Finance Projects': 'Finance',
-    'Publications': 'Publications',
-    'Presentations': 'Presentations',
-    'Sample Research Poster': 'Posters',
-    'Sample Industry Poster': 'Posters'
+  // Prevent double execution
+  if (window.__tabsDone) return;
+  window.__tabsDone = true;
+
+  var sectionIds = {
+    'education': 'Education',
+    'work-experience': 'Experience',
+    'selected-projects-and-research': 'Research',
+    'personal-projects': 'Projects',
+    'finance-projects': 'Finance',
+    'publications': 'Publications',
+    'presentations': 'Presentations',
+    'sample-research-poster': 'Posters',
+    'sample-industry-poster': 'Posters'
   };
 
-  function initTabs() {
-    const sections = {};
-    const tabLabels = new Set();
+  function makeTabs() {
+    var sections = {};
+    var labels = [];
     
-    // Find all h2 headings and match them to sections
-    const headings = document.querySelectorAll('main h2, main h3');
-    
-    headings.forEach(heading => {
-      const text = heading.textContent.trim();
-      const tabLabel = sectionMap[text];
-      
-      if (tabLabel) {
-        tabLabels.add(tabLabel);
-        
-        // Find the container for this section - look for parent with class 'container' or closest section/div
-        let container = heading.parentElement;
-        let found = false;
-        
-        // Try to find .container parent
-        while (container && container !== document.body) {
-          if (container.classList && container.classList.contains('container')) {
-            found = true;
-            break;
+    // Find all sections
+    for (var id in sectionIds) {
+      var el = document.getElementById(id);
+      if (el) {
+        var label = sectionIds[id];
+        var container = el.closest('.container');
+        if (container) {
+          if (!sections[label]) {
+            sections[label] = [];
+            labels.push(label);
           }
-          container = container.parentElement;
-        }
-        
-        // If no .container found, use the parent element
-        if (!found) {
-          container = heading.parentElement;
-        }
-        
-        if (!sections[tabLabel]) {
-          sections[tabLabel] = [];
-        }
-        if (!sections[tabLabel].includes(container)) {
-          sections[tabLabel].push(container);
+          sections[label].push(container);
         }
       }
-    });
+    }
 
-    if (Object.keys(sections).length === 0) {
-      console.log('Tabs: No sections found');
+    if (labels.length === 0) {
+      console.log('No sections found');
       return;
     }
 
-    // Handle poster sections - combine them
+    // Handle posters
     if (sections['Posters'] && sections['Posters'].length > 1) {
-      const posters = sections['Posters'];
-      const firstPoster = posters[0];
-      const parent = firstPoster.parentElement;
-      
-      const wrapper = document.createElement('div');
+      var posters = sections['Posters'];
+      var first = posters[0];
+      var parent = first.parentElement;
+      var wrapper = document.createElement('div');
       wrapper.className = 'container section-in-tabs';
-      wrapper.setAttribute('data-tab-section', 'Posters');
+      wrapper.setAttribute('data-tab', 'Posters');
       wrapper.style.display = 'none';
-      
-      parent.insertBefore(wrapper, firstPoster);
-      posters.forEach(post => wrapper.appendChild(post));
+      parent.insertBefore(wrapper, first);
+      posters.forEach(function(p) { wrapper.appendChild(p); });
       sections['Posters'] = [wrapper];
     }
 
-    // Mark all sections
-    Object.keys(sections).forEach(tabLabel => {
-      sections[tabLabel].forEach(container => {
+    // Hide all sections
+    for (var label in sections) {
+      sections[label].forEach(function(container) {
         container.classList.add('section-in-tabs');
-        container.setAttribute('data-tab-section', tabLabel);
+        container.setAttribute('data-tab', label);
         container.style.display = 'none';
       });
-    });
-
-    // Find insertion point
-    const aboutMe = document.getElementById('about-me');
-    const mainContent = document.querySelector('main');
-    
-    if (!mainContent) {
-      console.log('Tabs: No main content found');
-      return;
     }
 
-    // Create navigation
-    const navContainer = document.createElement('div');
-    navContainer.className = 'main-nav-tabs';
-    navContainer.style.cssText = 'margin: 20px 0; text-align: center; padding: 10px;';
-    
-    const navList = document.createElement('div');
+    // Find where to add nav
+    var aboutMe = document.getElementById('about-me');
+    var main = document.querySelector('main');
+    if (!main) return;
+
+    // Create nav
+    var nav = document.createElement('div');
+    nav.className = 'main-nav-tabs';
+    var navList = document.createElement('div');
     navList.className = 'tabs-nav';
-    navList.style.cssText = 'display: inline-flex; gap: 10px; flex-wrap: wrap; justify-content: center;';
     
-    const tabLabelsArray = Array.from(tabLabels).sort();
-    tabLabelsArray.forEach((tabLabel, index) => {
-      const button = document.createElement('button');
-      button.className = 'tab-button' + (index === 0 ? ' active' : '');
-      button.textContent = tabLabel;
-      button.setAttribute('data-tab', tabLabel);
-      button.setAttribute('type', 'button');
-      button.style.cssText = 'padding: 8px 16px; margin: 5px; border: 1px solid #ccc; background: ' + (index === 0 ? '#333; color: white;' : '#f5f5f5; color: #333;') + ' cursor: pointer; border-radius: 4px; font-size: 14px;';
-      button.addEventListener('click', function() { switchTab(tabLabel); });
-      navList.appendChild(button);
+    labels.sort();
+    labels.forEach(function(label, i) {
+      var btn = document.createElement('button');
+      btn.className = 'tab-button' + (i === 0 ? ' active' : '');
+      btn.textContent = label;
+      btn.setAttribute('data-tab', label);
+      btn.type = 'button';
+      btn.onclick = function() { showTab(label); };
+      navList.appendChild(btn);
     });
     
-    navContainer.appendChild(navList);
+    nav.appendChild(navList);
     
-    // Insert navigation
-    const aboutMeContainer = aboutMe ? aboutMe.closest('.container') : null;
-    if (aboutMeContainer && aboutMeContainer.nextSibling) {
-      aboutMeContainer.parentElement.insertBefore(navContainer, aboutMeContainer.nextSibling);
-    } else if (mainContent.firstChild) {
-      mainContent.insertBefore(navContainer, mainContent.firstChild);
+    // Insert nav
+    var aboutContainer = aboutMe ? aboutMe.closest('.container') : null;
+    if (aboutContainer && aboutContainer.nextSibling) {
+      aboutContainer.parentElement.insertBefore(nav, aboutContainer.nextSibling);
+    } else if (main.firstChild) {
+      main.insertBefore(nav, main.firstChild);
     } else {
-      mainContent.appendChild(navContainer);
+      main.appendChild(nav);
     }
 
     // Show first tab
-    if (tabLabelsArray.length > 0) {
-      switchTab(tabLabelsArray[0], false);
+    if (labels.length > 0) {
+      showTab(labels[0], false);
     }
   }
 
-  function switchTab(tabLabel) {
-    // Update button styles
-    document.querySelectorAll('.tab-button').forEach(btn => {
-      if (btn.getAttribute('data-tab') === tabLabel) {
-        btn.style.background = '#333';
-        btn.style.color = 'white';
+  function showTab(label, scroll) {
+    scroll = scroll !== false;
+    
+    // Update buttons
+    document.querySelectorAll('.tab-button').forEach(function(btn) {
+      btn.classList.remove('active');
+      if (btn.getAttribute('data-tab') === label) {
         btn.classList.add('active');
-      } else {
-        btn.style.background = '#f5f5f5';
-        btn.style.color = '#333';
-        btn.classList.remove('active');
       }
     });
 
     // Show/hide sections
-    document.querySelectorAll('.section-in-tabs').forEach(section => {
-      if (section.getAttribute('data-tab-section') === tabLabel) {
+    document.querySelectorAll('.section-in-tabs').forEach(function(section) {
+      if (section.getAttribute('data-tab') === label) {
         section.style.display = 'block';
+        section.classList.add('active');
       } else {
         section.style.display = 'none';
+        section.classList.remove('active');
       }
     });
-  }
-
-  // Initialize with retry logic
-  function tryInit() {
-    const main = document.querySelector('main');
-    const headings = document.querySelectorAll('main h2');
     
-    if (main && headings.length > 0) {
-      // Wait a bit more for full rendering
-      setTimeout(initTabs, 300);
-    } else {
-      setTimeout(tryInit, 200);
+    if (scroll) {
+      var nav = document.querySelector('.main-nav-tabs');
+      if (nav) nav.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }
 
+  // Try to run
+  function tryRun() {
+    var main = document.querySelector('main');
+    var edu = document.getElementById('education');
+    if (main && edu) {
+      setTimeout(makeTabs, 50);
+    } else {
+      setTimeout(tryRun, 100);
+    }
+  }
+
+  // Start
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', function() {
-      setTimeout(tryInit, 500);
-    });
+    document.addEventListener('DOMContentLoaded', tryRun);
   } else {
-    setTimeout(tryInit, 500);
+    tryRun();
   }
 })();
 </script>
