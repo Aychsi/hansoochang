@@ -4,7 +4,7 @@
 
 @import 'modern-resume-theme';
 
-/* Tab Navigation Styles - Top Navigation Bar */
+/* Tab Navigation Styles - CSS-only approach using :target */
 .main-nav-tabs {
   position: sticky;
   top: 0;
@@ -73,6 +73,50 @@
   background: #2a2a2a;
 }
 
+/* Hide all tab sections by default */
+.container.list-container:not(#about-me-container) {
+  display: none;
+}
+
+/* Show sections when targeted */
+#education:target ~ .container.list-container,
+#work-experience:target ~ .container.list-container,
+#selected-projects-and-research:target ~ .container.list-container,
+#personal-projects:target ~ .container.list-container,
+#finance-projects:target ~ .container.list-container,
+#publications:target ~ .container.list-container,
+#presentations:target ~ .container.list-container,
+#sample-research-poster:target ~ .container.list-container,
+#sample-industry-poster:target ~ .container.list-container {
+  display: block;
+}
+
+/* Alternative: Hide sections and show only when their ID is targeted */
+.container.list-container[id="education"],
+.container.list-container[id="work-experience"],
+.container.list-container[id="selected-projects-and-research"],
+.container.list-container[id="personal-projects"],
+.container.list-container[id="finance-projects"],
+.container.list-container[id="publications"],
+.container.list-container[id="presentations"],
+.container.list-container[id="sample-research-poster"],
+.container.list-container[id="sample-industry-poster"] {
+  display: none;
+}
+
+/* Show when targeted via URL hash */
+:target ~ .container.list-container[id],
+.container.list-container:target {
+  display: block !important;
+}
+
+/* Keep About Me always visible */
+#about-me,
+.container.intro-container {
+  display: block !important;
+}
+
+/* JavaScript-based approach (fallback) */
 .section-in-tabs {
   display: none;
 }
@@ -93,30 +137,14 @@
   }
 }
 
-#about-me {
-  display: block !important;
-}
-
 @media print {
   .main-nav-tabs,
   .tabs-nav {
     display: none;
   }
   
-  .section-in-tabs {
+  .section-in-tabs,
+  .container.list-container {
     display: block !important;
   }
 }
-
-/* Inject tabs script via CSS content (fallback method) */
-body::after {
-  content: '';
-  display: none;
-}
-
-/* Alternative: Use a data attribute to trigger script loading */
-body[data-tabs-enabled="true"]::before {
-  content: '';
-  display: none;
-}
-

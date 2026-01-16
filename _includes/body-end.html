@@ -1,23 +1,136 @@
 <script>
-// Auto-load tabs.js - ensures tabs functionality loads automatically
+// Tabs implementation - guaranteed to run
 (function() {
   'use strict';
-  if (window.__tabsLoaderExecuted) return;
-  window.__tabsLoaderExecuted = true;
-  
-  function loadTabsScript() {
-    var script = document.createElement('script');
-    // Use Jekyll's relative_url filter to get correct path with baseurl
-    script.src = '{{ "/assets/tabs.js" | relative_url }}';
-    script.defer = true;
-    script.setAttribute('data-tabs-loaded', 'true');
-    (document.head || document.body).appendChild(script);
+  if (window.__tabsInit) return;
+  window.__tabsInit = true;
+
+  var map = {
+    'education': 'Education',
+    'work-experience': 'Experience',
+    'selected-projects-and-research': 'Research',
+    'personal-projects': 'Projects',
+    'finance-projects': 'Finance',
+    'publications': 'Publications',
+    'presentations': 'Presentations',
+    'sample-research-poster': 'Posters',
+    'sample-industry-poster': 'Posters'
+  };
+
+  function init() {
+    var sections = {};
+    var labels = [];
+    
+    for (var id in map) {
+      var el = document.getElementById(id);
+      if (el) {
+        var label = map[id];
+        var container = el.closest('.container');
+        if (container) {
+          if (!sections[label]) {
+            sections[label] = [];
+            labels.push(label);
+          }
+          sections[label].push(container);
+        }
+      }
+    }
+
+    if (labels.length === 0) return;
+
+    // Handle posters
+    if (sections['Posters'] && sections['Posters'].length > 1) {
+      var posters = sections['Posters'];
+      var first = posters[0];
+      var parent = first.parentElement;
+      var wrapper = document.createElement('div');
+      wrapper.className = 'container section-in-tabs';
+      wrapper.setAttribute('data-tab', 'Posters');
+      wrapper.style.display = 'none';
+      parent.insertBefore(wrapper, first);
+      posters.forEach(function(p) { wrapper.appendChild(p); });
+      sections['Posters'] = [wrapper];
+    }
+
+    // Hide sections
+    for (var label in sections) {
+      sections[label].forEach(function(container) {
+        container.classList.add('section-in-tabs');
+        container.setAttribute('data-tab', label);
+        container.style.display = 'none';
+      });
+    }
+
+    var aboutMe = document.getElementById('about-me');
+    var main = document.querySelector('main');
+    if (!main) return;
+
+    // Create nav
+    var nav = document.createElement('div');
+    nav.className = 'main-nav-tabs';
+    var navList = document.createElement('div');
+    navList.className = 'tabs-nav';
+    
+    labels.sort();
+    labels.forEach(function(label, i) {
+      var btn = document.createElement('button');
+      btn.className = 'tab-button' + (i === 0 ? ' active' : '');
+      btn.textContent = label;
+      btn.setAttribute('data-tab', label);
+      btn.type = 'button';
+      btn.onclick = function() { showTab(label); };
+      navList.appendChild(btn);
+    });
+    
+    nav.appendChild(navList);
+    
+    var aboutContainer = aboutMe ? aboutMe.closest('.container') : null;
+    if (aboutContainer && aboutContainer.nextSibling) {
+      aboutContainer.parentElement.insertBefore(nav, aboutContainer.nextSibling);
+    } else if (main.firstChild) {
+      main.insertBefore(nav, main.firstChild);
+    } else {
+      main.appendChild(nav);
+    }
+
+    if (labels.length > 0) showTab(labels[0], false);
   }
-  
+
+  function showTab(label, scroll) {
+    scroll = scroll !== false;
+    document.querySelectorAll('.tab-button').forEach(function(btn) {
+      btn.classList.remove('active');
+      if (btn.getAttribute('data-tab') === label) btn.classList.add('active');
+    });
+    document.querySelectorAll('.section-in-tabs').forEach(function(section) {
+      if (section.getAttribute('data-tab') === label) {
+        section.style.display = 'block';
+        section.classList.add('active');
+      } else {
+        section.style.display = 'none';
+        section.classList.remove('active');
+      }
+    });
+    if (scroll) {
+      var nav = document.querySelector('.main-nav-tabs');
+      if (nav) nav.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
+  function tryRun() {
+    var main = document.querySelector('main');
+    var edu = document.getElementById('education');
+    if (main && edu) {
+      setTimeout(init, 50);
+    } else {
+      setTimeout(tryRun, 100);
+    }
+  }
+
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', loadTabsScript);
+    document.addEventListener('DOMContentLoaded', tryRun);
   } else {
-    loadTabsScript();
+    tryRun();
   }
 })();
 </script>
