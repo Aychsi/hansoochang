@@ -204,6 +204,21 @@ content:
     layout: list # Type of content section (list/text)
     content:
       - layout: top-middle
+        title: "Merck & McKinsey Financial Risk Modeling: Portfolio Segmentation & Market Analysis"
+        link: https://github.com/Aychsi/hansoochang/tree/main/risk_insurance
+        additional_links:
+          - title: GitHub Repository
+            icon: fab fa-github
+            url: https://github.com/Aychsi/hansoochang/tree/main/risk_insurance
+        description: | # this will include new lines to allow paragraphs
+          A comprehensive pharmaceutical sales risk analysis project demonstrating methodologies from my work at Merck & Co., Inc. partnering with McKinsey 
+          finance teams to build financial risk models for new drug launch. This project showcases SQL financial risk models for sales pattern analysis, 
+          portfolio segmentation by risk profile (adapted from Merck's $40M sales optimization), expected-value modeling for sales forecasting, Monte Carlo 
+          simulation for uncertainty analysis, and machine learning pipeline optimization. The system analyzes 500,000 synthetic Merck pharmaceutical sales 
+          records, segmenting 50 products by risk profile with comprehensive visualizations. This project demonstrates the analytical rigor from pharmaceutical 
+          sales and financial risk modeling at Merck/McKinsey, with quantified business impact including 15% conversion improvement and 20% cost reduction.
+
+      - layout: top-middle
         title: Dot-com vs AI Bubble Comparative Analysis
         link: https://github.com/Aychsi/Dot-com
         additional_links:
@@ -266,21 +281,6 @@ content:
           valuation analysis with a $1,200 target price, comprehensive risk assessment including valuation risk, payer pressure, and competitive dynamics, and 
           investment recommendation for long-term growth investors. The analysis demonstrates LLY's superior efficacy in GLP-1 treatments, diversified pipeline 
           beyond GLP-1, and multi-decade structural tailwind in obesity/diabetes care.
-
-      - layout: top-middle
-        title: "Merck & McKinsey Financial Risk Modeling: Portfolio Segmentation & Market Analysis"
-        link: https://github.com/Aychsi/hansoochang/tree/main/risk_insurance
-        additional_links:
-          - title: GitHub Repository
-            icon: fab fa-github
-            url: https://github.com/Aychsi/hansoochang/tree/main/risk_insurance
-        description: | # this will include new lines to allow paragraphs
-          A comprehensive pharmaceutical sales risk analysis project demonstrating methodologies from my work at Merck & Co., Inc. partnering with McKinsey 
-          finance teams to build financial risk models for new drug launch. This project showcases SQL financial risk models for sales pattern analysis, 
-          portfolio segmentation by risk profile (adapted from Merck's $40M sales optimization), expected-value modeling for sales forecasting, Monte Carlo 
-          simulation for uncertainty analysis, and machine learning pipeline optimization. The system analyzes 500,000 synthetic Merck pharmaceutical sales 
-          records, segmenting 50 products by risk profile with comprehensive visualizations. This project demonstrates the analytical rigor from pharmaceutical 
-          sales and financial risk modeling at Merck/McKinsey, with quantified business impact including 15% conversion improvement and 20% cost reduction.
 
   - title: Publications # Title for the section
     layout: list # Type of content section (list/text)

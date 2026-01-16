@@ -1,0 +1,119 @@
+<script>
+// Simple navigation tabs - inspired by wengong-jin.github.io
+(function() {
+  'use strict';
+  if (window.__navInit) return;
+  window.__navInit = true;
+
+  // Section IDs and labels
+  var sections = [
+    {id: 'about-me', label: 'About'},
+    {id: 'education', label: 'Education'},
+    {id: 'work-experience', label: 'Experience'},
+    {id: 'selected-projects-and-research', label: 'Research'},
+    {id: 'personal-projects', label: 'Projects'},
+    {id: 'finance-projects', label: 'Finance'},
+    {id: 'publications', label: 'Publications'},
+    {id: 'presentations', label: 'Presentations'}
+  ];
+
+  function initNav() {
+    var header = document.querySelector('.header-container');
+    if (!header) return;
+
+    // Create navigation bar
+    var nav = document.createElement('nav');
+    nav.className = 'main-nav';
+    nav.style.cssText = 'background: #fff; border-bottom: 1px solid #e0e0e0; padding: 1rem 0; position: sticky; top: 0; z-index: 1000;';
+    
+    var navList = document.createElement('ul');
+    navList.style.cssText = 'list-style: none; margin: 0; padding: 0; display: flex; justify-content: center; flex-wrap: wrap; gap: 2rem;';
+    
+    sections.forEach(function(section) {
+      var item = document.createElement('li');
+      var link = document.createElement('a');
+      link.href = '#' + section.id;
+      link.textContent = section.label;
+      link.style.cssText = 'text-decoration: none; color: #666; font-weight: 500; padding: 0.5rem 1rem; transition: color 0.3s;';
+      link.addEventListener('mouseenter', function() {
+        this.style.color = '#2c3e50';
+      });
+      link.addEventListener('mouseleave', function() {
+        if (!this.classList.contains('active')) {
+          this.style.color = '#666';
+        }
+      });
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        var target = document.getElementById(section.id);
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          // Update active state
+          document.querySelectorAll('.main-nav a').forEach(function(a) {
+            a.classList.remove('active');
+            a.style.color = '#666';
+          });
+          this.classList.add('active');
+          this.style.color = '#2c3e50';
+        }
+      });
+      item.appendChild(link);
+      navList.appendChild(item);
+    });
+    
+    nav.appendChild(navList);
+    
+    // Insert after header
+    header.parentElement.insertBefore(nav, header.nextSibling);
+    
+    // Set first link as active
+    var firstLink = navList.querySelector('a');
+    if (firstLink) {
+      firstLink.classList.add('active');
+      firstLink.style.color = '#2c3e50';
+    }
+  }
+
+  // Dark mode support
+  function updateNavColors() {
+    var isDark = document.body.classList.contains('dark');
+    var nav = document.querySelector('.main-nav');
+    if (nav) {
+      if (isDark) {
+        nav.style.background = '#1a1a1a';
+        nav.style.borderBottomColor = '#444';
+        nav.querySelectorAll('a').forEach(function(a) {
+          if (!a.classList.contains('active')) {
+            a.style.color = '#aaa';
+          }
+        });
+      } else {
+        nav.style.background = '#fff';
+        nav.style.borderBottomColor = '#e0e0e0';
+        nav.querySelectorAll('a').forEach(function(a) {
+          if (!a.classList.contains('active')) {
+            a.style.color = '#666';
+          }
+        });
+      }
+    }
+  }
+
+  // Initialize
+  function tryInit() {
+    var header = document.querySelector('.header-container');
+    if (header) {
+      setTimeout(initNav, 100);
+      setTimeout(updateNavColors, 150);
+    } else {
+      setTimeout(tryInit, 100);
+    }
+  }
+  
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', tryInit);
+  } else {
+    tryInit();
+  }
+})();
+</script>
