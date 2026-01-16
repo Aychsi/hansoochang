@@ -165,24 +165,40 @@
   function tryInit() {
     const aboutMe = document.getElementById('about-me');
     const main = document.querySelector('main');
-    console.log('tryInit - aboutMe:', !!aboutMe, 'main:', !!main);
+    const education = document.getElementById('education');
     
-    if (aboutMe && main) {
-      console.log('DOM ready, initializing tabs');
+    console.log('tryInit - aboutMe:', !!aboutMe, 'main:', !!main, 'education:', !!education);
+    
+    if (aboutMe && main && education) {
+      console.log('All required elements found, initializing tabs');
       initTabs();
     } else {
-      // Retry after a short delay
-      console.log('DOM not ready, retrying...');
-      setTimeout(tryInit, 100);
+      // Retry after a short delay (max 5 seconds)
+      if (typeof tryInit.retries === 'undefined') {
+        tryInit.retries = 0;
+      }
+      tryInit.retries++;
+      if (tryInit.retries < 50) { // Try for up to 5 seconds
+        console.log('DOM not ready, retrying... (attempt', tryInit.retries, ')');
+        setTimeout(tryInit, 100);
+      } else {
+        console.error('Tabs initialization failed: Required elements not found after 5 seconds', {
+          aboutMe: !!aboutMe,
+          main: !!main,
+          education: !!education
+        });
+      }
     }
   }
 
-  // Start initialization
+  // Wait for everything to load - give Jekyll time to render
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', tryInit);
+    document.addEventListener('DOMContentLoaded', function() {
+      setTimeout(tryInit, 300); // Extra delay to ensure Jekyll has rendered
+    });
   } else {
-    // DOM already loaded, try immediately
-    tryInit();
+    // DOM already loaded, but wait a bit for Jekyll rendering
+    setTimeout(tryInit, 300);
   }
 })();
 </script>
